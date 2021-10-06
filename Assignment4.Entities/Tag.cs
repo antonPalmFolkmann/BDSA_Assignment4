@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Assignment4.Entities
 {
@@ -12,6 +11,4 @@ namespace Assignment4.Entities
         public string Name { get; set; }
         public ICollection<Task> Tasks { get; set; }
     }
-
-
 }
