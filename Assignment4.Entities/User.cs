@@ -13,7 +13,6 @@ namespace Assignment4.Entities
 
         [Required]
         [StringLength(100)]
-        [EmailAddress]
         public string Email { get; set; }
 
         public ICollection<Task> Tasks { get; set; }
