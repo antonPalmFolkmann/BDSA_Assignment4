@@ -11,13 +11,30 @@ namespace Assignment4.Entities
     public class TaskRepository : ITaskRepository
     {
         private readonly SqlConnection _connection;
+        private readonly KanbanContext _context;
 
-        public TaskRepository(SqlConnection connection)
+        public TaskRepository(SqlConnection connection, KanbanContext context)
         {
             _connection = connection;
+            _context = context;
         }
 
-        public IReadOnlyCollection<TaskDTO> All()
+        public (Response Response, int TaskId) Create(TaskCreateDTO task)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Response Delete(int taskId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public TaskDetailsDTO Read(int taskId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IReadOnlyCollection<TaskDTO> ReadAll()
         {
             var cmdText = @"SELECT * FROM Tasks";
             using var command = new SqlCommand(cmdText, _connection);
@@ -25,7 +42,6 @@ namespace Assignment4.Entities
             OpenConnection();
 
             using var reader = command.ExecuteReader();
-            using var context = new KanbanContext();
 
             var list = new List<TaskDTO>();
             var task = new Task();
@@ -36,15 +52,15 @@ namespace Assignment4.Entities
                 {
                     Id = reader.GetInt32("Id"),
                     Title = reader.GetString("Title"),
-                    Description = reader.GetString("Description"),
-                    AssignedToId = reader.GetInt32("AssignedToId"),
-                    Tags = context
+                    AssignedToName = reader.GetString("AssignedToName"),
+                    Tags = _context
                             .Entry(task)
                             .Collection(e => e.Tags)
                             .Query()
                             .OrderBy(t => t.Name)
                             .Select(t => t.Name)
-                            .ToList(),
+                            .ToList()
+                            .AsReadOnly(),
                     State = (Core.State)Enum.Parse(typeof(State), "test")
                 });
             }
@@ -56,94 +72,29 @@ namespace Assignment4.Entities
             return readOnlyTasks;
         }
 
-        public int Create(TaskDTO task)
+        public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
         {
-            var cmdText = @"INSERT Task (Id, Title, AssignedToId, Description, State, Tags)
-                            VALUES (@Id, @Title, @AssignedToId, @Description, @State, @Tags);
-                            SELECT LASTVAL()";
-
-            using var command = new SqlCommand(cmdText, _connection);
-
-            command.Parameters.AddWithValue("@Id", task.Id);
-            command.Parameters.AddWithValue("@Title", task.Title);
-            command.Parameters.AddWithValue("@AssignedToId", task.AssignedToId);
-            command.Parameters.AddWithValue("@Description", task.Description);
-            command.Parameters.AddWithValue("@State", task.State);
-            command.Parameters.AddWithValue("@Tags", task.Tags);
-
-            OpenConnection();
-
-            var id = command.ExecuteScalar();
-
-            CloseConnection();
-
-            return (int)id;
+            throw new System.NotImplementedException();
         }
 
-        public void Delete(int taskId)
+        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
         {
-            var cmdText = @"DELETE Tasks WHERE Id = @Id";
-
-            using var command = new SqlCommand(cmdText, _connection);
-
-            command.Parameters.AddWithValue("@Id", taskId);
-
-            OpenConnection();
-
-            command.ExecuteNonQuery();
-
-            CloseConnection();
+            throw new System.NotImplementedException();
         }
 
-        public TaskDetailsDTO FindById(int id)
+        public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
         {
-            var cmdText = @"SELECT Tasks WHERE Id = @Id";
-
-            using var command = new SqlCommand(cmdText, _connection);
-
-            command.Parameters.AddWithValue("@Id", id);
-
-            OpenConnection();
-
-            using var reader = command.ExecuteReader();
-
-            var description = reader.Read()
-                ? new TaskDetailsDTO
-                {
-                    Description = reader.GetString("Description")
-                }
-                : null;
-
-            CloseConnection();
-
-            return description;
+            throw new System.NotImplementedException();
         }
 
-        public void Update(TaskDTO task)
+        public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
         {
-            var cmdText = @"UPDATE Tasks SET
-                            Id = @Id,
-                            Title = @Title,
-                            Description = @Description,
-                            AssignedToId = @AssignedToId,
-                            Tags = @Tags,
-                            State = @State
-                            WHERE Id = @Id";
+            throw new System.NotImplementedException();
+        }
 
-            using var command = new SqlCommand(cmdText, _connection);
-
-            command.Parameters.AddWithValue("@Id", task.Id);
-            command.Parameters.AddWithValue("@Title", task.Title);
-            command.Parameters.AddWithValue("@Description", task.Description);
-            command.Parameters.AddWithValue("@AssignedToId", task.AssignedToId);
-            command.Parameters.AddWithValue("@Tags", task.Tags);
-            command.Parameters.AddWithValue("@State", task.State);
-
-            OpenConnection();
-
-            command.ExecuteNonQuery();
-
-            CloseConnection();
+        public Response Update(TaskUpdateDTO task)
+        {
+            throw new System.NotImplementedException();
         }
 
         private void OpenConnection()

@@ -12,7 +12,7 @@ namespace Assignment4.Entities
         [StringLength(100)]
         public string Title { get; set; }
 
-        public User? AssignedToId { get; set; }
+        public User? AssignedTo { get; set; }
 
         public string? Description { get; set; }
 
