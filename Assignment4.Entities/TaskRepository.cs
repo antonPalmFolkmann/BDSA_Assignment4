@@ -48,21 +48,20 @@ namespace Assignment4.Entities
 
             while (reader.Read())
             {
-                list.Add(new TaskDTO
-                {
-                    Id = reader.GetInt32("Id"),
-                    Title = reader.GetString("Title"),
-                    AssignedToName = reader.GetString("AssignedToName"),
-                    Tags = _context
+                var Id = reader.GetInt32("Id");
+                var Title = reader.GetString("Title");
+                var AssignedToName = reader.GetString("AssignedToName");
+                var Tags = _context
                             .Entry(task)
                             .Collection(e => e.Tags)
                             .Query()
                             .OrderBy(t => t.Name)
                             .Select(t => t.Name)
                             .ToList()
-                            .AsReadOnly(),
-                    State = (Core.State)Enum.Parse(typeof(State), "test")
-                });
+                            .AsReadOnly();
+                var State = (Core.State)Enum.Parse(typeof(State), "test");
+
+                list.Add(new TaskDTO(Id, Title, AssignedToName, Tags, State));
             }
 
             CloseConnection();
