@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Assignment4.Core
 {
-    public interface ITaskRepository
+    public interface ITaskRepository : IDisposable
     {
         (Response Response, int TaskId) Create(TaskCreateDTO task);
         IReadOnlyCollection<TaskDTO> ReadAll();

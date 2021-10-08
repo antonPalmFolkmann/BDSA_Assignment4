@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace Assignment4.Core
 {
-    public interface ITagRepository
+    public interface ITagRepository : IDisposable
     {
         (Response Response, int TagId) Create(TagCreateDTO tag);
         IReadOnlyCollection<TagDTO> ReadAll();
