@@ -29,5 +29,10 @@ namespace Assignment4.Entities
         {
             throw new System.NotImplementedException();
         }
+
+        public void Dispose()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

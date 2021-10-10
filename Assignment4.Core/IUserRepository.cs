@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace Assignment4.Core
 {
-    public interface IUserRepository
+    public interface IUserRepository : IDisposable
     {
         (Response Response, int UserId) Create(UserCreateDTO user);
         IReadOnlyCollection<UserDTO> ReadAll();
