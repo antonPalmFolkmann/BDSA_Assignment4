@@ -58,6 +58,18 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
+        public void Create_user_with_existing_email_return_Conflict() {
+            // Arrange
+            var user = new UserCreateDTO { Name = "Name 3", Email = "title2@mail.com" };
+
+            // Act
+            var created = _repository.Create(user);
+
+            // Assert
+            Assert.Equal(Response.Conflict, created.Response);
+        }
+
+        [Fact]
         public void Delete_given_non_existing_id_returns_NotFound()
         {
             // Arrange

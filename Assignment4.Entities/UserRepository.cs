@@ -14,6 +14,19 @@ namespace Assignment4.Entities
 
         public (Response Response, int UserId) Create(UserCreateDTO user)
         {
+
+            var usersWithSameEmail = from c in _context.Users
+                                    where c.Email == user.Email
+                                    select new UserDTO(
+                                        c.Id,
+                                        c.Name,
+                                        c.Email
+                                    );
+            
+            if (usersWithSameEmail.Count() != 0) {
+                return (Response.Conflict, -1);
+            }
+
             var entity = new User { Name = user.Name, Email = user.Email };
 
             _context.Users.Add(entity);
