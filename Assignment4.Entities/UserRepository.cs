@@ -48,7 +48,18 @@ namespace Assignment4.Entities
 
         public Response Update(UserUpdateDTO user)
         {
-            throw new System.NotImplementedException();
+            var entity = _context.Users.Find(user.Id);
+
+            if (entity == null) {
+                return Response.NotFound;
+            }
+
+            entity.Name = user.Name;
+            entity.Email = user.Email;
+
+            _context.SaveChanges();
+
+            return Response.Updated;
         }
 
         public void Dispose()

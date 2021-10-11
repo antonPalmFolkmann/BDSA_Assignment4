@@ -30,7 +30,7 @@ namespace Assignment4.Entities.Tests
             var tasks = new List<Task>();
             tasks.Add(task1);
 
-            var user1 = new User { Id = 1, Name = "Title 1", Email = "title1@mail.com", Tasks = tasks};
+            var user1 = new User { Id = 1, Name = "Name 1", Email = "title1@mail.com", Tasks = tasks};
             task1.AssignedTo = user1;
 
             context.Add(user1);
@@ -79,6 +79,38 @@ namespace Assignment4.Entities.Tests
             // Assert
             Assert.Equal(Response.Deleted, deleted);
             Assert.Null(_context.Users.Find(3));
+        }
+
+        [Fact]
+        public void Update_given_non_existing_id_returns_NotFound()
+        {
+            var repository = new UserRepository(_context);
+
+            var user = new UserUpdateDTO
+            {
+                Id = 14
+            };
+
+            var updated = repository.Update(user);
+
+            Assert.Equal(Response.NotFound, updated);
+        }
+
+        [Fact]
+        public void Update_updates_existing_user() 
+        {
+            var repository = new UserRepository(_context);
+
+            var user = new UserUpdateDTO
+            {
+                Id = 1,
+                Name = "Name 1 updated",
+                Email = "title1@mail.com"
+            };
+
+            var updated = repository.Update(user);
+
+            Assert.Equal(Response.Updated, updated);
         }
 
 
