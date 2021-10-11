@@ -110,7 +110,7 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
-        public void Delete_given_existing_id_and_assigned_tasks_with_force_returns_deletes()
+        public void Delete_given_existing_id_and_assigned_tasks_with_force_returns_Deleted()
         {
             // Arrange
             var repository = new UserRepository(_context);
