@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Assignment4.Core;
+using System.Linq;
 
 namespace Assignment4.Entities
 {
@@ -41,10 +42,10 @@ namespace Assignment4.Entities
             throw new System.NotImplementedException();
         }
 
-        public IReadOnlyCollection<UserDTO> ReadAll()
-        {
-            throw new System.NotImplementedException();
-        }
+        public IReadOnlyCollection<UserDTO> ReadAll() =>
+            _context.Users
+                    .Select(c => new UserDTO(c.Id, c.Name, c.Email))
+                    .ToList().AsReadOnly();
 
         public Response Update(UserUpdateDTO user)
         {

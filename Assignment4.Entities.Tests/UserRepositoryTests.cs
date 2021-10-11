@@ -33,7 +33,10 @@ namespace Assignment4.Entities.Tests
             var user1 = new User { Id = 1, Name = "Name 1", Email = "title1@mail.com", Tasks = tasks};
             task1.AssignedTo = user1;
 
+            var user2 = new User { Id = 2, Name = "Name 2", Email = "title2@mail.com", Tasks = tasks};
+
             context.Add(user1);
+            context.Add(user2);
 
             context.SaveChanges();
 
@@ -44,13 +47,13 @@ namespace Assignment4.Entities.Tests
         [Fact]
         public void Create_user_return_reponse_and_id() {
             // Arrange
-            var user2 = new UserCreateDTO { Name = "Name 2", Email = "title2@mail.com" };
+            var user = new UserCreateDTO { Name = "Name 3", Email = "title3@mail.com" };
 
             // Act
-            var created = _repository.Create(user2);
+            var created = _repository.Create(user);
 
             // Assert
-            Assert.Equal(2, created.UserId);
+            Assert.Equal(3, created.UserId);
             Assert.Equal(Response.Created, created.Response);
         }
 
@@ -78,7 +81,7 @@ namespace Assignment4.Entities.Tests
 
             // Assert
             Assert.Equal(Response.Deleted, deleted);
-            Assert.Null(_context.Users.Find(3));
+            Assert.Null(_context.Users.Find(1));
         }
 
         [Fact]
@@ -111,6 +114,17 @@ namespace Assignment4.Entities.Tests
             var updated = repository.Update(user);
 
             Assert.Equal(Response.Updated, updated);
+        }
+
+        [Fact]
+        public void Read_returns_all_users()
+        {
+            var characters = _repository.ReadAll();
+
+            Assert.Collection(characters,
+                c => Assert.Equal(new UserDTO(1, "Name 1", "title1@mail.com"), c),
+                c => Assert.Equal(new UserDTO(2, "Name 2", "title2@mail.com"), c)
+            );
         }
 
 
