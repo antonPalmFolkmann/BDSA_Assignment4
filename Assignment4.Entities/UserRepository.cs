@@ -5,9 +5,21 @@ namespace Assignment4.Entities
 {
     public class UserRepository : IUserRepository
     {
+        private readonly IKanbanContext _context;
+
+        public UserRepository(IKanbanContext context) {
+            _context = context;
+        }
+
         public (Response Response, int UserId) Create(UserCreateDTO user)
         {
-            throw new System.NotImplementedException();
+            var entity = new User { Name = user.Name, Email = user.Email };
+
+            _context.Users.Add(entity);
+
+            _context.SaveChanges();
+
+            return (Response.Created, entity.Id);
         }
 
         public Response Delete(int userId, bool force = false)
