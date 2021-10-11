@@ -127,6 +127,16 @@ namespace Assignment4.Entities.Tests
             );
         }
 
+        [Fact]
+        public void Read_given_id_exists_returns_User()
+        {
+            var user  = _repository.Read(2);
+
+            Assert.Equal(2, user.Id);
+            Assert.Equal("Name 2", user.Name);
+            Assert.Equal("title2@mail.com", user.Email);
+        }
+
 
         public void Dispose()
         {
