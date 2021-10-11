@@ -24,7 +24,16 @@ namespace Assignment4.Entities
 
         public Response Delete(int userId, bool force = false)
         {
-            throw new System.NotImplementedException();
+            var entity = _context.Users.Find(userId);
+
+            if (entity == null) {
+                return Response.NotFound;
+            }
+
+            _context.Users.Remove(entity);
+            _context.SaveChanges();
+
+            return Response.Deleted;
         }
 
         public UserDTO Read(int userId)

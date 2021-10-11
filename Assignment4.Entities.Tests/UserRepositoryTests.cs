@@ -54,6 +54,34 @@ namespace Assignment4.Entities.Tests
             Assert.Equal(Response.Created, created.Response);
         }
 
+        [Fact]
+        public void Delete_given_non_existing_id_returns_NotFound()
+        {
+            // Arrange
+            var repository = new UserRepository(_context);
+
+            // Act
+            var deleted = repository.Delete(25);
+
+            // Assert
+            Assert.Equal(Response.NotFound, deleted);
+        }
+
+        [Fact]
+        public void Delete_given_existing_id_deletes()
+        {
+            // Arrange
+            var repository = new UserRepository(_context);
+
+            // Act
+            var deleted = repository.Delete(1);
+
+            // Assert
+            Assert.Equal(Response.Deleted, deleted);
+            Assert.Null(_context.Users.Find(3));
+        }
+
+
         public void Dispose()
         {
             _context.Dispose();
