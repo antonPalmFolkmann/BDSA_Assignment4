@@ -31,6 +31,10 @@ namespace Assignment4.Entities
                 return Response.NotFound;
             }
 
+            if (entity.Tasks.Count() != 0 && force == false) {
+                return Response.Conflict;
+            }
+
             _context.Users.Remove(entity);
             _context.SaveChanges();
 
@@ -73,7 +77,7 @@ namespace Assignment4.Entities
 
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            _context.Dispose();
         }
     }
 }

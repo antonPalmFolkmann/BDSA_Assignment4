@@ -33,7 +33,7 @@ namespace Assignment4.Entities.Tests
             var user1 = new User { Id = 1, Name = "Name 1", Email = "title1@mail.com", Tasks = tasks};
             task1.AssignedTo = user1;
 
-            var user2 = new User { Id = 2, Name = "Name 2", Email = "title2@mail.com", Tasks = tasks};
+            var user2 = new User { Id = 2, Name = "Name 2", Email = "title2@mail.com", Tasks = new List<Task>()};
 
             context.Add(user1);
             context.Add(user2);
@@ -71,7 +71,21 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
-        public void Delete_given_existing_id_deletes()
+        public void Delete_given_existing_id_and_no_assigned_tasks_deletes()
+        {
+            // Arrange
+            var repository = new UserRepository(_context);
+
+            // Act
+            var deleted = repository.Delete(2);
+
+            // Assert
+            Assert.Equal(Response.Deleted, deleted);
+            Assert.Null(_context.Users.Find(2));
+        }
+
+        [Fact]
+        public void Delete_given_existing_id_and_assigned_tasks_returns_Conflict()
         {
             // Arrange
             var repository = new UserRepository(_context);
@@ -80,8 +94,20 @@ namespace Assignment4.Entities.Tests
             var deleted = repository.Delete(1);
 
             // Assert
+            Assert.Equal(Response.Conflict, deleted);
+        }
+
+        [Fact]
+        public void Delete_given_existing_id_and_assigned_tasks_with_force_returns_deletes()
+        {
+            // Arrange
+            var repository = new UserRepository(_context);
+
+            // Act
+            var deleted = repository.Delete(1, true);
+
+            // Assert
             Assert.Equal(Response.Deleted, deleted);
-            Assert.Null(_context.Users.Find(1));
         }
 
         [Fact]
