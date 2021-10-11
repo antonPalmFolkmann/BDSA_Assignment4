@@ -5,9 +5,16 @@ namespace Assignment4.Entities
 {
     public class TagRepository : ITagRepository
     {
+        private readonly KanbanContext _context;
+
+        public TagRepository(KanbanContext context)
+        {
+            _context = context;
+        }
+
         public (Response Response, int TagId) Create(TagCreateDTO tag)
         {
-            throw new System.NotImplementedException();
+            return (Response.Created, 1);
         }
 
         public Response Delete(int tagId, bool force = false)
