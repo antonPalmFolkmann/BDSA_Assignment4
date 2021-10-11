@@ -9,7 +9,7 @@ namespace Assignment4.Entities
 
         [Required]
         [StringLength(100)]
-        public string Title { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [StringLength(100)]
