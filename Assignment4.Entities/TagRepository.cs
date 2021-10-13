@@ -41,6 +41,14 @@ namespace Assignment4.Entities
         {
             var entity = _context.Tags.Find(tagId);
 
+            if(entity == null){
+                return Response.NotFound;
+            }
+
+            if(entity.Tasks.Count != 0 && force == false){
+                return Response.Conflict;
+            }
+
             _context.Tags.Remove(entity);
             _context.SaveChanges();
 
@@ -49,22 +57,36 @@ namespace Assignment4.Entities
 
         public TagDTO Read(int tagId)
         {
-            throw new System.NotImplementedException();
+            var tags = from t in _context.Tags
+                        where t.Id == tagId
+                        select new TagDTO(
+                            t.Id,
+                            t.Name
+                        );
+            return tags.FirstOrDefault();
         }
 
-        public IReadOnlyCollection<TagDTO> ReadAll()
-        {
-            throw new System.NotImplementedException();
-        }
+        public IReadOnlyCollection<TagDTO> ReadAll() => 
+            _context.Tags
+            .Select(t => new TagDTO(t.Id, t.Name))
+            .ToList().AsReadOnly();
 
         public Response Update(TagUpdateDTO tag)
         {
-            throw new System.NotImplementedException();
+            var entity = _context.Tags.Find(tag.Id);
+            if(entity == null){
+                return Response.NotFound;
+            }
+
+            entity.Name = tag.Name;
+            _context.SaveChanges();
+
+            return Response.Updated;
         }
 
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            _context.Dispose();
         }
     }
 }
