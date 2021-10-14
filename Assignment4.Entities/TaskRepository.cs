@@ -84,21 +84,35 @@ namespace Assignment4.Entities
                 .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
                 .ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag) =>
+        public IReadOnlyCollection<TaskDTO> ReadAllByState(State state) =>
             _context.Tasks
-                .Where(t => t.Tags.Select(t => t.Name).Equals(tag))
+                .Where(t => t.State == state)
                 .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
                 .ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
+        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag) 
         {
-            throw new System.NotImplementedException();
+            var tasks = new List<TaskDTO>();
+
+            foreach (var task in _context.Tasks)
+            {
+                foreach (var t in task.Tags)
+                {
+                    if (t.Name == tag)
+                    {
+                        tasks.Add(new TaskDTO ( task.Id, task.Title, task.AssignedTo.Name, task.Tags.Select(t => t.Name).ToHashSet(), task.State ));
+                    }
+                }
+            }
+
+            return tasks;
         }
+
+        public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId) =>
+            _context.Tasks
+                .Where(t => t.AssignedTo.Id == userId)
+                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .ToList().AsReadOnly();
 
         public IReadOnlyCollection<TaskDTO> ReadAllRemoved() =>
             _context.Tasks

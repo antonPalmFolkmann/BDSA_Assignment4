@@ -24,7 +24,8 @@ namespace Assignment4.Entities.Tests
 
             var Tag1 = new Tag { Id = 1, Name = "Tag1", Tasks = new List<Task>() };
             var Tag2 = new Tag { Id = 2, Name = "Tag2", Tasks = new List<Task>() };
-        
+            var Tag3 = new Tag { Id = 3, Name = "Tag3", Tasks = new List<Task>() };
+
 
             var task1 = new Task { Id = 1, Title = "Task1", Description = "Task1 Description", State = State.New, Tags = new[] { Tag1, Tag2 } };
 
@@ -38,7 +39,7 @@ namespace Assignment4.Entities.Tests
             context.Tasks.AddRange(
                 task1,
                 new Task { Id = 2, Title = "Task2", AssignedTo = user2, Description = "Task2 Description", State = State.New, Tags = new[] { Tag1, Tag2 } },
-                new Task { Id = 3, Title = "Task3", AssignedTo = user3, Description = "Task3 Description", State = State.Removed, Tags = new[] { Tag1, Tag2 } },
+                new Task { Id = 3, Title = "Task3", AssignedTo = user3, Description = "Task3 Description", State = State.Removed, Tags = new[] { Tag1, Tag2, Tag3 } },
                 new Task { Id = 4, Title = "Task4", AssignedTo = user4, Description = "Task4 Description", State = State.Active, Tags = new[] { Tag1, Tag2 } }
             );
 
@@ -91,7 +92,7 @@ namespace Assignment4.Entities.Tests
             var tasks = _repo.ReadAll();
 
             //Assert
-            Assert.Collection(tasks, 
+            Assert.Collection(tasks,
                 t => Assert.Equal(task1.Title, t.Title),
                 t => Assert.Equal(task2.Title, t.Title),
                 t => Assert.Equal(task3.Title, t.Title),
@@ -110,12 +111,11 @@ namespace Assignment4.Entities.Tests
             var tasks = _repo.ReadAllRemoved();
 
             //Assert
-            Assert.Collection(tasks, 
+            Assert.Collection(tasks,
                 t => Assert.Equal(task3.Title, t.Title)
             );
         }
 
-        //-------------------------------------------------------| 
         [Fact]
         public void ReadAllByTag_given_tag_returns_task()
         {
@@ -124,17 +124,45 @@ namespace Assignment4.Entities.Tests
             var task3 = new TaskDTO(3, "Task3", "Name3", tags, State.Removed);
 
             //Act
-            var tasks = _repo.ReadAllByTag("Tag1");
+            var tasks = _repo.ReadAllByTag("Tag3");
 
             //Assert
-            Assert.Collection(tasks, 
+            Assert.Collection(tasks,
                 t => Assert.Equal(task3.Title, t.Title)
             );
         }
-        //-------------------------------------------------------| 
-        // ReadAllByUser
-        // ReadAllByState
-        //-------------------------------------------------------| 
+
+        [Fact]
+        public void ReadAllByUser_given_user_returns_task()
+        {
+            //Arrange
+            var tags = new HashSet<string>();
+            var task2 = new TaskDTO(2, "Task2", "Name2", tags, State.Removed);
+
+            //Act
+            var tasks = _repo.ReadAllByUser(2);
+
+            //Assert
+            Assert.Collection(tasks,
+                t => Assert.Equal(task2.Title, t.Title)
+            );
+        }
+
+        [Fact]
+        public void ReadAllByState_given_state_returns_related_tasks()
+        {
+            //Arrange
+            var tags = new HashSet<string>();
+            var task4 = new TaskDTO(4, "Task4", "Name4", tags, State.Active);
+
+            //Act
+            var tasks = _repo.ReadAllByState(State.Active);
+
+            //Then
+            Assert.Collection(tasks,
+                t => Assert.Equal(task4.Title, t.Title)
+            );
+        }
 
         [Fact]
         public void Read_given_non_existing_id_returns_null()
