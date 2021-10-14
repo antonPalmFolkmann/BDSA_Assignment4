@@ -40,7 +40,9 @@ namespace Assignment4.Entities.Tests
                 task1,
                 new Task { Id = 2, Title = "Task2", AssignedTo = user2, Description = "Task2 Description", State = State.New, Tags = new[] { Tag1, Tag2 } },
                 new Task { Id = 3, Title = "Task3", AssignedTo = user3, Description = "Task3 Description", State = State.Removed, Tags = new[] { Tag1, Tag2, Tag3 } },
-                new Task { Id = 4, Title = "Task4", AssignedTo = user4, Description = "Task4 Description", State = State.Active, Tags = new[] { Tag1, Tag2 } }
+                new Task { Id = 4, Title = "Task4", AssignedTo = user4, Description = "Task4 Description", State = State.Active, Tags = new[] { Tag1, Tag2 } },
+                new Task { Id = 5, Title = "Task5", AssignedTo = user4, Description = "Task5 Description", State = State.Resolved, Tags = new[] { Tag1, Tag2 } },
+                new Task { Id = 6, Title = "Task6", AssignedTo = user4, Description = "Task6 Description", State = State.Closed, Tags = new[] { Tag1, Tag2 } }
             );
 
             context.SaveChanges();
@@ -53,13 +55,13 @@ namespace Assignment4.Entities.Tests
         public void Create_given_task_return_response_and_id()
         {
             //Arrrange
-            var task = new TaskCreateDTO { Title = "Task5" };
+            var task = new TaskCreateDTO { Title = "Task7" };
 
             //Act
             var created = _repo.Create(task);
 
             //Assert
-            Assert.Equal(5, created.TaskId);
+            Assert.Equal(7, created.TaskId);
             Assert.Equal(Response.Created, created.Response);
         }
 
@@ -78,6 +80,33 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
+        public void Create_sets_state_to_New()
+        {
+            //Arrange
+            var task = new TaskCreateDTO { Title = "Task7" };
+
+            //Act
+            var created = _repo.Create(task);
+
+            //Assert
+            Assert.Equal(State.New, _repo.Read(created.TaskId).State);
+        }
+
+        [Fact]
+        public void Create_sets_Created_and_StateUpdated_to_current_UTC_time()
+        {
+            //Arrange
+            var task = new TaskCreateDTO { Title = "Task7" };
+
+            //Act
+            var created = _repo.Create(task);
+
+            //Assert
+            Assert.Equal(DateTime.UtcNow, _repo.Read(created.TaskId).Created, precision: TimeSpan.FromSeconds(5));
+            Assert.Equal(DateTime.UtcNow, _repo.Read(created.TaskId).StateUpdated, precision: TimeSpan.FromSeconds(5));
+        }
+
+        [Fact]
         public void ReadAll_returns_all_tasks()
         {
             //Arrange
@@ -87,6 +116,8 @@ namespace Assignment4.Entities.Tests
             var task2 = new TaskDTO(2, "Task2", "Name2", tags, State.New);
             var task3 = new TaskDTO(3, "Task3", "Name3", tags, State.Removed);
             var task4 = new TaskDTO(4, "Task4", "Name4", tags, State.Active);
+            var task5 = new TaskDTO(5, "Task5", "Name5", tags, State.Resolved);
+            var task6 = new TaskDTO(6, "Task6", "Name6", tags, State.Closed);
 
             //Act
             var tasks = _repo.ReadAll();
@@ -96,7 +127,9 @@ namespace Assignment4.Entities.Tests
                 t => Assert.Equal(task1.Title, t.Title),
                 t => Assert.Equal(task2.Title, t.Title),
                 t => Assert.Equal(task3.Title, t.Title),
-                t => Assert.Equal(task4.Title, t.Title)
+                t => Assert.Equal(task4.Title, t.Title),
+                t => Assert.Equal(task5.Title, t.Title),
+                t => Assert.Equal(task6.Title, t.Title)
             );
         }
 
@@ -137,7 +170,7 @@ namespace Assignment4.Entities.Tests
         {
             //Arrange
             var tags = new HashSet<string>();
-            var task2 = new TaskDTO(2, "Task2", "Name2", tags, State.Removed);
+            var task2 = new TaskDTO(2, "Task2", "Name2", tags, State.New);
 
             //Act
             var tasks = _repo.ReadAllByUser(2);
@@ -219,6 +252,19 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
+        public void Update_updates_stateUpdated_to_current_UTC_time()
+        {
+            //Arrange
+            var task = new TaskUpdateDTO { Id = 1, Title = "Title1" };
+
+            //Act
+            var updated = _repo.Update(task);
+
+            //Assert
+            Assert.Equal(DateTime.UtcNow, _repo.Read(1).StateUpdated, precision: TimeSpan.FromSeconds(5));
+        }
+
+        [Fact]
         public void Delete_given_non_existing_id_returns_NotFound()
         {
             //Arrange & Act
@@ -248,6 +294,36 @@ namespace Assignment4.Entities.Tests
             //Assert
             Assert.Equal(Response.Deleted, deleted);
             Assert.Null(_context.Tasks.Find(2));
+        }
+
+        [Fact]
+        public void Delete_given_task_with_state_Active_sets_state_Removed()
+        {
+            //Arrange & Act
+            var deleted = _repo.Delete(4);
+
+            //Assert
+            Assert.Equal(State.Removed, _context.Tasks.Find(4).State);
+            Assert.NotNull(_context.Tasks.Find(4));
+        }
+
+        [Fact]
+        public void Delete_given_task_other_states_returns_Conflict()
+        {
+            //Arrange & Act
+            var sateRemoved = _repo.Delete(3);
+            var stateResolved = _repo.Delete(5);
+            var stateClosed = _repo.Delete(6);
+
+            //Assert
+            Assert.Equal(Response.Conflict, sateRemoved);
+            Assert.NotNull(_context.Tasks.Find(3));
+
+            Assert.Equal(Response.Conflict, stateResolved);
+            Assert.NotNull(_context.Tasks.Find(5));
+
+            Assert.Equal(Response.Conflict, stateClosed);
+            Assert.NotNull(_context.Tasks.Find(6));
         }
     }
 }

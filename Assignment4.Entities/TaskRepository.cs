@@ -23,7 +23,7 @@ namespace Assignment4.Entities
                                     c.Id,
                                     c.Title,
                                     c.AssignedTo.Name,
-                                    (IReadOnlyCollection<string>)c.Tags,
+                                    c.Tags.Select(t => t.Name).ToHashSet(),
                                     c.State
                                 );
 
@@ -32,7 +32,7 @@ namespace Assignment4.Entities
                 return (Response.Conflict, -1);
             }
 
-            var entity = new Task { Title = task.Title };
+            var entity = new Task { Title = task.Title, State = State.New, Created = DateTime.UtcNow, StateUpdated = DateTime.UtcNow };
 
             _context.Tasks.Add(entity);
 
@@ -52,6 +52,10 @@ namespace Assignment4.Entities
 
             if (entity.State != State.New)
             {
+                if (entity.State == State.Active)
+                {
+                    entity.State = State.Removed;
+                }
                 return Response.Conflict;
             }
 
@@ -130,6 +134,7 @@ namespace Assignment4.Entities
             }
 
             entity.Title = task.Title;
+            entity.StateUpdated = DateTime.UtcNow;
 
             _context.SaveChanges();
 
